@@ -1,23 +1,38 @@
+import bodyParser from "body-parser";
+import cors from "cors";
 import express from "express";
-import http from 'http';
-import path from 'path';
-import methods from 'methods';
-import bodyParser from 'body-parser';
-import session from 'express-session';
-import cors from 'cors';
-import passport from 'passport';
-import errorhandler from 'errorhandler';
-import mongoose from 'mongoose';
+import session from "express-session";
+import mongoose from "mongoose";
+import morgan from "morgan";
+import routes from "../routes";
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === "production";
 
 const app = express();
 const port = 8080; // default port to listen
 
-// define a route handler for the default home page
-app.get("/", (req, res) => {
-  res.send("Hello world!!!!!");
-});
+app.use(cors());
+
+// Normal express config defaults
+app.use(morgan("dev", {
+  skip(req, res) { return res.statusCode < 400; }
+}));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// app.use(require("method-override")());
+app.use(express.static(__dirname + "/public"));
+
+app.use(session({ secret: "conduit", cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
+
+if (isProduction) {
+  mongoose.connect(process.env.MONGODB_URI);
+} else {
+  mongoose.connect("mongodb://localhost/conduit");
+  mongoose.set("debug", true);
+}
+
+app.use(routes);
 
 // start the Express server
 app.listen(port, () => {
