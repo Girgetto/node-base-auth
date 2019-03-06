@@ -4,7 +4,7 @@ import express from "express";
 import session from "express-session";
 import mongoose from "mongoose";
 import morgan from "morgan";
-import routes from "../routes";
+import * as masterRouter from "../routes/index";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -32,7 +32,7 @@ if (isProduction) {
   mongoose.set("debug", true);
 }
 
-app.use(routes);
+app.use("/api", masterRouter);
 
 // start the Express server
 app.listen(port, () => {

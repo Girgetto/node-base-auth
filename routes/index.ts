@@ -1,9 +1,12 @@
-import express from "express";
-// define a route handler for the default home page
-express.Router().get("/", (req, res) => {
-  res.send("Hello world!!!!!");
-});
+import * as express from "express";
 
-// router.use('/api', require('./api'));
+export = (() => {
 
-export default express;
+    const router = express.Router();
+
+    router.get("/admin", (req, res) => {
+        res.json({success: true});
+    });
+
+    return router;
+})();
